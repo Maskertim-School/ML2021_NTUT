@@ -1,0 +1,65 @@
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.datasets import load_breast_cancer
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+def get_mean_of_missing_values_attr(attribute):
+    numbers = 0
+    total = 0
+    for value in attribute:
+        if value != '?':
+            total += int(value)
+            numbers += 1
+    return total / numbers
+
+def get_data():
+    breast_cancer = pd.read_csv('breast-cancer-wisconsin.data', header=None, usecols=range(1, 11))
+    breast_cancer.replace(to_replace='?', value=get_mean_of_missing_values_attr(breast_cancer.iloc[:, 5]), inplace=True)
+    breast_cancer = breast_cancer.astype('int64')
+    features = breast_cancer.iloc[:, :9].values
+    classes = breast_cancer.iloc[:, 9].values
+    
+    return features, classes
+def get_needed_week_classifiers(tree):
+    features_train, features_test, classes_train, classes_test = train_test_split(features, classes, test_size=0.3)
+    score = 0
+    count = 1
+    
+    while score != 1:
+        clf = AdaBoostClassifier(base_estimator=tree, n_estimators=count)
+        clf.fit(features_train, classes_train)
+        score = clf.score(features_train, classes_train)
+        count += 1
+        
+    return count
+
+def get_accuracy_with(tree, tree_number_range):
+    features_train, features_test, classes_train, classes_test = train_test_split(features, classes, test_size=0.3)
+    accuracy = []
+    
+    for tree_number in tree_number_range:
+        clf = AdaBoostClassifier(base_estimator=tree, n_estimators=tree_number)
+        clf.fit(features_train, classes_train)
+        accuracy.append(clf.score(features_test, classes_test)*100)
+        
+    return accuracy
+features, classes = get_data()
+
+tree = DecisionTreeClassifier(max_depth=2)
+print(f'weak classifiers needed: {get_needed_week_classifiers(tree)}')
+weak classifiers needed: 13
+tree = DecisionTreeClassifier(max_depth=2)
+tree_number_range = range(5, 96, 10)
+accuracy = get_accuracy_with(tree, tree_number_range)
+plt.plot(tree_number_range, accuracy)
+plt.show()
+print('Accuracy improved while there are more weak classifiers')
+
+tree = DecisionTreeClassifier(max_depth=1)
+tree_number_range = range(5, 101, 5)
+accuracy = get_accuracy_with(tree, tree_number_range)
+plt.plot(tree_number_range, accuracy)
+plt.show()
+print(f'Average accuray of tree depth of one: {np.mean(accuracy)}%')
