@@ -1,0 +1,3 @@
+LDA use decision line to sperate the classes, so if there are k classes, only k-1 are left after dimensionality reduction.
+
+=> There are 2 classes in the breast cancer dataset, so the maximum number of feature dimension is 1.

@@ -1,0 +1,48 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA, FastICA
+from scipy.io import wavfile
+from scipy import signal
+samplerate_1, signal_1 = wavfile.read('./org_1.wav')
+samplerate_2, signal_2 = wavfile.read('./org_2.wav')
+
+X = list(zip(signal_1, signal_2))
+
+ica = FastICA(n_components=2)
+ica_tf = ica.fit_transform(X)
+ica_result_1 = ica_tf[:, 0]
+ica_result_2 = ica_tf[:, 1]
+
+plt.figure(figsize=(12, 15))
+
+plt.subplot(411)
+plt.title('org_1 after ICA')
+plt.plot(ica_result_1)
+plt.ylim(-1e-2, 1e-2)
+
+plt.subplot(412)
+plt.title('org_2 after ICA')
+plt.plot(ica_result_2)
+plt.ylim(-1e-2, 1e-2)
+
+pca = PCA(n_components=2)
+pca_tf = pca.fit_transform(X)
+pca_result_1 = pca_tf[:, 0]
+pca_result_2 = pca_tf[:, 1]
+
+plt.subplot(413)
+plt.title('org_1 after PCA')
+plt.plot(pca_result_1)
+plt.ylim(-2e4, 2e4)
+
+plt.subplot(414)
+plt.title('org_2 after PCA')
+plt.plot(pca_result_2)
+plt.ylim(-3e3, 3e3)
+
+plt.show()
+print("PCA can't separate the sources")
+----
+PCA can't separate the sources
+----

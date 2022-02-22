@@ -1,0 +1,67 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
+from sklearn.svm import SVC
+def get_mean_of_missing_values_attr(attribute):
+    numbers = 0
+    total = 0
+    for value in attribute:
+        if value != '?':
+            total += int(value)
+            numbers += 1
+    return total / numbers
+
+def get_data():
+    breast_cancer = pd.read_csv('breast-cancer-wisconsin.data', header=None, usecols=range(1, 11))
+    breast_cancer.replace(to_replace='?', value=get_mean_of_missing_values_attr(breast_cancer.iloc[:, 5]), inplace=True)
+    breast_cancer = breast_cancer.astype('int64')
+    features = breast_cancer.iloc[:, :9].values
+    classes = breast_cancer.iloc[:, 9].values
+    
+    return features, classes
+
+features, classes = get_data()
+pca = PCA()
+pca.fit(features)
+buffer = []
+
+for i in pca.explained_variance_ratio_:
+    buffer.append(i)
+cumsum = np.cumsum(buffer)
+
+print(f'4a.')
+plt.bar(range(1, 10), buffer, alpha=0.5, align='center', label='Pov()')
+plt.step(range(1, 10), cumsum, where='mid', label='cumulative PoV()')
+plt.legend(loc='best')
+plt.tight_layout()
+plt.show()
+
+print(cumsum)
+print(f'{np.where(cumsum > 0.9)[0][0] + 1} components are necessary to ensure Pov(k) > 0.9')
+-----
+[0.68914923 0.76181664 0.8227912  0.86706586 0.90605337 0.94064958
+ 0.96592691 0.9885998  1.        ]
+5 components are necessary to ensure Pov(k) > 0.9
+----
+
+average_scores = []
+for n_component in range(1, 10):
+    scores = []
+    for _ in range(10):
+        features_train, features_test, classes_train, classes_test = train_test_split(features, classes, test_size=0.3)
+        pca = PCA(n_components=n_component)
+        pca.fit(features_train)
+        features_train_tf = pca.transform(features_train)
+        features_test_tf = pca.transform(features_test)
+        
+        svm = SVC(kernel='rbf')
+        svm.fit(features_train_tf, classes_train)
+        scores.append(svm.score(features_test_tf, classes_test))
+    
+    average_scores.append(np.mean(scores))
+
+print(f'4b.')
+plt.plot(range(1, 10), average_scores)
+plt.show()
