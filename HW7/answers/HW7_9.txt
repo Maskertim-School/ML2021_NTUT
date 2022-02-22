@@ -1,0 +1,59 @@
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from keras.utils import np_utils
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.regularizers import l2
+import matplotlib.pyplot as plt    
+import numpy as np
+NB_CLASSES = 3
+
+X = load_wine().data
+y = load_wine().target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+# Preprocess The X Data By Scaling
+sc = StandardScaler(with_mean=True, with_std=True)
+sc.fit(X_train)
+X_train_std = sc.transform(X_train)
+X_test_std = sc.transform(X_test)
+
+Y_train = np_utils.to_categorical(y_train, NB_CLASSES)
+Y_test  = np_utils.to_categorical(y_test, NB_CLASSES)
+
+accuracy = []
+units = range(10, 101, 10)
+for unit in units:
+    model = Sequential([
+        Dense(units = unit, activation='relu', input_shape=(X_train.shape[1],), kernel_regularizer=l2()),
+        Dense(units = unit, activation='relu', kernel_regularizer=l2()),
+        Dense(units = NB_CLASSES, activation='softmax'),
+    ])
+
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    model.fit(X_train_std, Y_train, batch_size=128, epochs=10, verbose=0, validation_split=0.25)
+
+    accuracy.append(model.evaluate(X_test_std, Y_test, verbose=1)[1])
+
+plt.xlabel('hidden units')
+plt.ylabel('accuracy')
+plt.plot(units, accuracy)
+plt.show()
+print(f'average accuracy: {np.mean(accuracy) * 100}')
+
+--------------------OUTPUT-------------------
+
+2/2 [==============================] - 0s 3ms/step - loss: 1.5676 - accuracy: 0.3333
+2/2 [==============================] - 0s 2ms/step - loss: 1.5893 - accuracy: 0.2593
+2/2 [==============================] - 0s 3ms/step - loss: 1.4280 - accuracy: 0.5000
+2/2 [==============================] - 0s 3ms/step - loss: 1.3109 - accuracy: 0.8148
+2/2 [==============================] - 0s 2ms/step - loss: 1.5267 - accuracy: 0.8519
+2/2 [==============================] - 0s 2ms/step - loss: 1.7047 - accuracy: 0.7222
+2/2 [==============================] - 0s 2ms/step - loss: 1.6238 - accuracy: 0.7593
+2/2 [==============================] - 0s 2ms/step - loss: 1.6863 - accuracy: 0.8148
+2/2 [==============================] - 0s 3ms/step - loss: 1.7174 - accuracy: 0.9074
+2/2 [==============================] - 0s 3ms/step - loss: 1.7825 - accuracy: 0.9444
+
+average accuracy: 69.07407402992249

@@ -1,0 +1,18 @@
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+import numpy as np
+accuracy = []
+X, Y = load_wine().data, load_wine().target
+
+for _ in range(10):
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
+    model = LogisticRegression(solver='liblinear')
+    model.fit(X_train, Y_train)
+    accuracy.append(model.score(X_test, Y_test))
+
+print(f'average accuracy: {np.mean(accuracy)*100}')
+
+--------------- OUTPUT-------------------------------------
+average accuracy: 95.37037037037038
+According to sklearn document, sovler should be 'liblinear'
