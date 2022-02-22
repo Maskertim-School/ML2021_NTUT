@@ -1,0 +1,20 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+from hmmlearn import hmm
+
+zip = np.load('HMM_data.npz')
+X1_train = zip['arr_0'] # trainin sequence for 1st HMM
+X2_train = zip['arr_1'] # training sequence for 2nd HMM
+test_1 = zip['arr_2'] # two test sequences
+test_2 = zip['arr_3']
+
+print(X1_train)
+    
+# Create two models to be trained ...
+testHMM1 = hmm.MultinomialHMM(n_components=3,n_iter=100) # number of states is actually unknown, we assume we know it
+testHMM2 = hmm.MultinomialHMM(n_components=3,n_iter=100) # number of states is actually unknown, we assume we know it
+
+# Perform HMM training
+
+# Perform HMM test and print the class of each test sequence here ...

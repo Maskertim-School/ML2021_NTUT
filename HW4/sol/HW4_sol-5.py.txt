@@ -1,0 +1,19 @@
+import pandas as pd
+from sklearn import tree
+import matplotlib.pyplot as plt
+df = pd.DataFrame()
+
+df['Outlook'] = ['Sunny', 'Sunny', 'Overcast', 'Overcast', 'Rain', 'Rain']
+df['Temperature'] = ['Hi', 'Hi', 'Hi', 'Lo', 'Lo', 'Lo']
+df['Humidity'] = ['Hi', 'Hi', 'Lo', 'Lo', 'Hi', 'Hi']
+df['Windy'] = ['No', 'Yes', 'No', 'Yes', 'No', 'Yes']
+df['Decision'] = ['No play', 'No play', 'Play', 'Play', 'Play', 'No play']
+one_hot_data = pd.get_dummies(df[ ['Outlook', 'Temperature', 'Humidity', 'Windy'] ])
+clf = tree.DecisionTreeClassifier()
+clf_train = clf.fit(one_hot_data, df['Decision'])
+plt.figure(figsize=(10,10))
+tree.plot_tree(clf_train, feature_names=list(one_hot_data.columns.values), class_names=['No Play', 'Play'], rounded=True, filled=True)
+plt.show()
+
+pred = clf.predict([ [0, 0, 1, 1, 0, 0, 1, 0, 1] ])
+print(f'decision: {pred[0]}')

@@ -1,0 +1,22 @@
+from math import log2
+"""
+Given H0 = 65, Total Entropy = 0.94
+H <= H0: #play = 1, #no play = 0
+H > H0: #play = 8, #no play = 5
+"""
+
+humidity_entropy = -8/13*log2(8/13)-5/13*log2(5/13)-log2(1)-0
+G = 0.94 - 13/14 * humidity_entropy
+G
+
+"""
+Given 
+En(𝑆=rainy) = 0.971 
+Humidity(High): #play = 3, #no play = 1
+Humidity(Low): #play = 0, #no play = 1
+"""
+
+humidity_high_entropy = -3/4*log2(3/4)-1/4*log2(1/4)
+humidity_low_entropy = 0
+G = 0.971 - 4/5*humidity_high_entropy 
+G
